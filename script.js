@@ -202,18 +202,27 @@ class PingPongHub {
         this.matches = matchData.matches;
         console.log('Matches loaded:', this.matches);
     
-        // tournaments
-        console.log('Fetching tournaments...');
-        let tres = await fetch('/.netlify/functions/tournaments');
-        if (!tres.ok) {
-          throw new Error(`Tournaments API error: ${tres.status}`);
+        // tournaments (optional)
+        try {
+          console.log('Fetching tournaments...');
+          let tres = await fetch('/.netlify/functions/tournaments');
+          if (!tres.ok) {
+            console.warn('Tournaments API not available:', tres.status);
+            this.tournaments = [];
+          } else {
+            let tournamentData = await tres.json();
+            if (!tournamentData.tournaments) {
+              console.warn('Invalid tournaments response format');
+              this.tournaments = [];
+            } else {
+              this.tournaments = tournamentData.tournaments;
+              console.log('Tournaments loaded:', this.tournaments);
+            }
+          }
+        } catch (tournamentError) {
+          console.warn('Error loading tournaments:', tournamentError);
+          this.tournaments = [];
         }
-        let tournamentData = await tres.json();
-        if (!tournamentData.tournaments) {
-          throw new Error('Invalid tournaments response format');
-        }
-        this.tournaments = tournamentData.tournaments;
-        console.log('Tournaments loaded:', this.tournaments);
         
         console.log('All data reloaded successfully');
       } catch (error) {
@@ -244,7 +253,13 @@ class PingPongHub {
         console.log('Test dashboard: Main screen shown');
       } catch (error) {
         console.error('Test dashboard error:', error);
-        this.showMessage('Error showing dashboard', 'error');
+        // Only show error if it's not a tournaments error
+        if (!error.message.includes('Tournaments')) {
+          this.showMessage('Error showing dashboard: ' + error.message, 'error');
+        } else {
+          // If it's just tournaments failing, continue to show dashboard
+          this.showMainScreen();
+        }
       }
     }
   
