@@ -2,7 +2,8 @@
 class PingPongHub {
     constructor() {
       // load persisted session (just username)
-      this.currentUser = JSON.parse(localStorage.getItem('pingpong_currentUser'));
+      const savedUser = localStorage.getItem('pingpong_currentUser');
+      this.currentUser = savedUser ? JSON.parse(savedUser) : null;
       this.users = [];
       this.matches = [];
       this.tournaments = [];
@@ -11,8 +12,14 @@ class PingPongHub {
   
     async init() {
       if (this.currentUser) {
-        await this.reloadAllData();
-        this.showMainScreen();
+        try {
+          await this.reloadAllData();
+          this.showMainScreen();
+        } catch (error) {
+          console.error('Error loading data:', error);
+          // If there's an error loading data, log the user out
+          this.logout();
+        }
       } else {
         this.showAuthScreen();
       }
@@ -232,37 +239,6 @@ class PingPongHub {
       }
     }
   
-    // Test function to show dashboard directly
-    async testDashboard() {
-      try {
-        // Use test user data
-        this.currentUser = {
-          username: 'Adam',
-          elo: 1000,
-          coins: 500,
-          wins: 0,
-          losses: 0
-        };
-        localStorage.setItem('pingpong_currentUser', JSON.stringify(this.currentUser));
-        
-        this.showMessage('Loading dashboard...', 'info');
-        console.log('Test dashboard: Loading data...');
-        await this.reloadAllData();
-        console.log('Test dashboard: Data loaded, showing main screen...');
-        this.showMainScreen();
-        console.log('Test dashboard: Main screen shown');
-      } catch (error) {
-        console.error('Test dashboard error:', error);
-        // Only show error if it's not a tournaments error
-        if (!error.message.includes('Tournaments')) {
-          this.showMessage('Error showing dashboard: ' + error.message, 'error');
-        } else {
-          // If it's just tournaments failing, continue to show dashboard
-          this.showMainScreen();
-        }
-      }
-    }
-  
     // ----------------------------------
     // UI & Tabs
     // ----------------------------------
@@ -432,7 +408,4 @@ class PingPongHub {
     document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
     document.getElementById(`${tab}-form`).classList.add('active');
   }
-  
-  // Add to the global functions at the bottom
-  function testDashboard() { app.testDashboard(); }
   
