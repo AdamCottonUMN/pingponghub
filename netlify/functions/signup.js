@@ -17,16 +17,17 @@ export default async function handler(event) {
         }
         const bodyText = new TextDecoder().decode(Buffer.concat(chunks));
         body = JSON.parse(bodyText);
+      } else if (typeof event.body === 'string') {
+        body = JSON.parse(event.body);
       } else {
-        // Fallback to direct parsing if not a stream
-        body = event.body ? JSON.parse(event.body) : event;
+        body = event.body;
       }
       console.log('Parsed request body:', body);
     } catch (e) {
       console.error('Error parsing body:', e);
       return new Response(JSON.stringify({ 
         error: 'Invalid request body',
-        details: 'Request body must be valid JSON'
+        details: e.message
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -97,7 +98,11 @@ export default async function handler(event) {
     console.log('Sending response:', response);
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      }
     });
   } catch (error) {
     console.error('Signup error details:', {
@@ -110,7 +115,11 @@ export default async function handler(event) {
       details: error.message
     }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      }
     });
   }
 }
