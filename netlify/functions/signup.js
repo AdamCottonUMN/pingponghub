@@ -1,12 +1,8 @@
 import { neon } from '@netlify/neon'
 
-export default async function handler(event, context) {
+export default async function handler(event) {
   try {
-    console.log('Starting signup process...');
-    const sql = neon()
-    console.log('Database connection initialized');
-    
-    // Fix body parsing
+    // Parse request body
     let body;
     try {
       body = event.body ? JSON.parse(event.body) : event;
@@ -32,11 +28,14 @@ export default async function handler(event, context) {
         headers: { 'Content-Type': 'application/json' }
       });
     }
-    console.log('Parsed request body, username:', username);
 
-    // 1) ensure users table
+    // Initialize database connection
+    console.log('Initializing database connection...');
+    const sql = neon();
+    
+    // Create users table if it doesn't exist
     console.log('Creating users table if not exists...');
-    await sql`
+    await sql.query(`
       CREATE TABLE IF NOT EXISTS users (
         username TEXT PRIMARY KEY,
         password TEXT,
@@ -45,34 +44,35 @@ export default async function handler(event, context) {
         wins     INTEGER,
         losses   INTEGER
       );
-    `
-    console.log('Users table ready');
+    `);
 
-    // 2) check duplicate
+    // Check for existing user
     console.log('Checking for existing user...');
-    const [exists] = await sql`
-      SELECT 1 FROM users WHERE username = ${username}
-    `
-    if (exists) {
+    const { rows: existingUsers } = await sql.query(
+      'SELECT 1 FROM users WHERE username = $1',
+      [username]
+    );
+
+    if (existingUsers.length > 0) {
       console.log('Username already exists');
       return new Response(JSON.stringify({ error: 'Username taken' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
-      })
+      });
     }
 
-    // 3) insert new user
+    // Insert new user
     console.log('Creating new user...');
-    await sql`
-      INSERT INTO users (username, password, elo, coins, wins, losses)
-      VALUES (${username}, ${password}, 1000, 500, 0, 0);
-    `
+    await sql.query(
+      'INSERT INTO users (username, password, elo, coins, wins, losses) VALUES ($1, $2, $3, $4, $5, $6)',
+      [username, password, 1000, 500, 0, 0]
+    );
     console.log('User created successfully');
-    
+
     return new Response(JSON.stringify({ message: 'OK' }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
-    })
+    });
   } catch (error) {
     console.error('Signup error details:', {
       message: error.message,
@@ -85,6 +85,6 @@ export default async function handler(event, context) {
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    })
+    });
   }
 }

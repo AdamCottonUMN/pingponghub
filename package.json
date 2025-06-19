@@ -2,10 +2,10 @@
     "name": "pingponghub",
     "version": "1.0.0",
     "engines": {
-      "node": "18.x"
+      "node": ">=20.12.2"
     },
     "dependencies": {
-      "@netlify/neon": "^0.1.0"
+      "@netlify/neon": "^1.0.0"
     }
   }
   
