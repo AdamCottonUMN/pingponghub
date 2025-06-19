@@ -173,17 +173,58 @@ class PingPongHub {
     // Data Loading
     // ----------------------------------
     async reloadAllData() {
-      // users
-      let ures = await fetch('/.netlify/functions/users');
-      this.users = (await ures.json()).users;
+      try {
+        console.log('Starting to reload all data...');
+        
+        // users
+        console.log('Fetching users...');
+        let ures = await fetch('/.netlify/functions/users');
+        this.users = (await ures.json()).users;
+        console.log('Users loaded:', this.users);
+    
+        // matches
+        console.log('Fetching matches...');
+        let mres = await fetch('/.netlify/functions/matches');
+        this.matches = (await mres.json()).matches;
+        console.log('Matches loaded:', this.matches);
+    
+        // tournaments
+        console.log('Fetching tournaments...');
+        let tres = await fetch('/.netlify/functions/tournaments');
+        this.tournaments = (await tres.json()).tournaments;
+        console.log('Tournaments loaded:', this.tournaments);
+        
+        console.log('All data reloaded successfully');
+      } catch (error) {
+        console.error('Error reloading data:', error);
+        this.showMessage('Error loading data', 'error');
+        throw error; // Re-throw to be caught by the calling function
+      }
+    }
   
-      // matches
-      let mres = await fetch('/.netlify/functions/matches');
-      this.matches = (await mres.json()).matches;
-  
-      // tournaments (if you have that function)
-      let tres = await fetch('/.netlify/functions/tournaments');
-      this.tournaments = (await tres.json()).tournaments;
+    // Test function to show dashboard directly
+    async testDashboard() {
+      try {
+        // Use test user data
+        this.currentUser = {
+          username: 'Adam',
+          elo: 1000,
+          coins: 500,
+          wins: 0,
+          losses: 0
+        };
+        localStorage.setItem('pingpong_currentUser', JSON.stringify(this.currentUser));
+        
+        this.showMessage('Loading dashboard...', 'info');
+        console.log('Test dashboard: Loading data...');
+        await this.reloadAllData();
+        console.log('Test dashboard: Data loaded, showing main screen...');
+        this.showMainScreen();
+        console.log('Test dashboard: Main screen shown');
+      } catch (error) {
+        console.error('Test dashboard error:', error);
+        this.showMessage('Error showing dashboard', 'error');
+      }
     }
   
     // ----------------------------------
@@ -355,4 +396,7 @@ class PingPongHub {
     document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
     document.getElementById(`${tab}-form`).classList.add('active');
   }
+  
+  // Add to the global functions at the bottom
+  function testDashboard() { app.testDashboard(); }
   
