@@ -52,6 +52,7 @@ class PingPongHub {
         return this.showMessage('Fill in both fields','error');
       }
       try {
+        console.log('Attempting signup for user:', u);
         let res = await fetch('/.netlify/functions/signup', {
           method: 'POST',
           headers: {
@@ -60,12 +61,27 @@ class PingPongHub {
           body: JSON.stringify({username:u,password:p}),
         });
         
-        const data = await res.json();
+        console.log('Signup response status:', res.status);
+        let data;
+        try {
+          data = await res.json();
+          console.log('Signup response data:', data);
+        } catch (e) {
+          console.error('Error parsing signup response:', e);
+          return this.showMessage('Invalid server response', 'error');
+        }
+        
         if (!res.ok) {
+          console.error('Signup error:', data);
           return this.showMessage(data.error || 'Signup failed', 'error');
         }
         
-        this.currentUser = data.user || { username:u };
+        if (!data.user) {
+          console.error('No user data in signup response:', data);
+          return this.showMessage('Invalid server response', 'error');
+        }
+        
+        this.currentUser = data.user;
         localStorage.setItem('pingpong_currentUser', JSON.stringify(this.currentUser));
         await this.reloadAllData();
         this.showMainScreen();
@@ -82,6 +98,7 @@ class PingPongHub {
         return this.showMessage('Fill in both fields','error');
       }
       try {
+        console.log('Attempting login for user:', u);
         let res = await fetch('/.netlify/functions/login', {
           method: 'POST',
           headers: {
@@ -90,20 +107,23 @@ class PingPongHub {
           body: JSON.stringify({username: u, password: p}),
         });
         
+        console.log('Login response status:', res.status);
         let data;
         try {
           data = await res.json();
+          console.log('Login response data:', data);
         } catch (e) {
-          console.error('Error parsing response:', e);
+          console.error('Error parsing login response:', e);
           return this.showMessage('Invalid server response', 'error');
         }
         
         if (!res.ok) {
+          console.error('Login error:', data);
           return this.showMessage(data.error || 'Login failed', 'error');
         }
         
         if (!data.user) {
-          console.error('No user data in response:', data);
+          console.error('No user data in login response:', data);
           return this.showMessage('Invalid server response', 'error');
         }
         

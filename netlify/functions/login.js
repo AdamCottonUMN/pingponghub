@@ -63,7 +63,7 @@ export default async function handler(event) {
     }
 
     console.log('Login successful for user:', username);
-    return new Response(JSON.stringify({ 
+    const response = {
       message: 'OK',
       user: {
         username: user.username,
@@ -72,7 +72,9 @@ export default async function handler(event) {
         wins: user.wins,
         losses: user.losses
       }
-    }), {
+    };
+    console.log('Sending response:', response);
+    return new Response(JSON.stringify(response), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });

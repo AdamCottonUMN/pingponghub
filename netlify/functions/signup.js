@@ -88,11 +88,14 @@ export default async function handler(event) {
       SELECT username, elo, coins, wins, losses
       FROM users WHERE username = ${username}
     `;
+    console.log('Created user data:', user);
 
-    return new Response(JSON.stringify({ 
+    const response = {
       message: 'OK',
       user: user
-    }), {
+    };
+    console.log('Sending response:', response);
+    return new Response(JSON.stringify(response), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
