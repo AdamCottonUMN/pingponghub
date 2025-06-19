@@ -1,6 +1,7 @@
 import { neon } from '@netlify/neon'
 
 export default async function handler(event) {
+  console.log('Full event object:', JSON.stringify(event, null, 2));
   try {
     // Parse request body
     let body;
