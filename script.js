@@ -71,17 +71,30 @@ class PingPongHub {
     async login() {
       const u = document.getElementById('login-username').value.trim();
       const p = document.getElementById('login-password').value;
-      let res = await fetch('/.netlify/functions/login', {
-        method:'POST',
-        body: JSON.stringify({username:u,password:p}),
-      });
-      if (!res.ok) {
-        return this.showMessage('Invalid credentials','error');
+      if (!u || !p) {
+        return this.showMessage('Fill in both fields','error');
       }
-      this.currentUser = { username:u };
-      localStorage.setItem('pingpong_currentUser', JSON.stringify(this.currentUser));
-      await this.reloadAllData();
-      this.showMainScreen();
+      try {
+        let res = await fetch('/.netlify/functions/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({username: u, password: p}),
+        });
+        if (!res.ok) {
+          const errorData = await res.json();
+          return this.showMessage(errorData.error || 'Login failed', 'error');
+        }
+        const data = await res.json();
+        this.currentUser = data.user || { username: u };
+        localStorage.setItem('pingpong_currentUser', JSON.stringify(this.currentUser));
+        await this.reloadAllData();
+        this.showMainScreen();
+      } catch (error) {
+        console.error('Login error:', error);
+        this.showMessage('Login failed', 'error');
+      }
     }
   
     logout() {
