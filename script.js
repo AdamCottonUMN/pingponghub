@@ -369,15 +369,49 @@ class PingPongHub {
     // Leaderboards
     // ----------------------------------
     async loadLeaderboards() {
-      let res = await fetch('/.netlify/functions/leaderboards');
-      let { elo, coins } = await res.json();
-      const ctr = document.getElementById('leaderboard-content');
-      ctr.innerHTML = `
-        <h3>Elo</h3>
-        ${elo.map(u=>`<div>${u.username}: ${u.elo}</div>`).join('')}
-        <h3>Coins</h3>
-        ${coins.map(u=>`<div>${u.username}: ${u.coins}</div>`).join('')}
-      `;
+      try {
+        const ctr = document.getElementById('leaderboard-content');
+        ctr.innerHTML = '<div class="loading">Loading leaderboards...</div>';
+        
+        let res = await fetch('/.netlify/functions/leaderboards');
+        if (!res.ok) {
+          throw new Error(`Leaderboards API error: ${res.status}`);
+        }
+        
+        let data = await res.json();
+        if (!data.elo || !data.coins) {
+          throw new Error('Invalid leaderboard data format');
+        }
+
+        const formatRank = (list, valueKey) => {
+          return list.map((u, i) => `
+            <div class="leaderboard-row ${u.username === this.currentUser.username ? 'current-user' : ''}">
+              <span class="rank">#${i + 1}</span>
+              <span class="username">${u.username}</span>
+              <span class="value">${u[valueKey]}</span>
+            </div>
+          `).join('');
+        };
+
+        ctr.innerHTML = `
+          <div class="leaderboard-section">
+            <h3>Elo Rankings</h3>
+            <div class="leaderboard-list">
+              ${formatRank(data.elo, 'elo')}
+            </div>
+          </div>
+          <div class="leaderboard-section">
+            <h3>Coin Rankings</h3>
+            <div class="leaderboard-list">
+              ${formatRank(data.coins, 'coins')}
+            </div>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Error loading leaderboards:', error);
+        const ctr = document.getElementById('leaderboard-content');
+        ctr.innerHTML = `<div class="error">Error loading leaderboards: ${error.message}</div>`;
+      }
     }
   
     // ----------------------------------
