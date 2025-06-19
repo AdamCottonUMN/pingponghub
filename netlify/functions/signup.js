@@ -6,7 +6,32 @@ export default async function handler(event, context) {
     const sql = neon()
     console.log('Database connection initialized');
     
-    const { username, password } = JSON.parse(event.body)
+    // Fix body parsing
+    let body;
+    try {
+      body = event.body ? JSON.parse(event.body) : event;
+      console.log('Request body:', body);
+    } catch (e) {
+      console.error('Error parsing body:', e);
+      return new Response(JSON.stringify({ 
+        error: 'Invalid request body',
+        details: 'Request body must be valid JSON'
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const { username, password } = body;
+    if (!username || !password) {
+      return new Response(JSON.stringify({ 
+        error: 'Missing credentials',
+        details: 'Both username and password are required'
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
     console.log('Parsed request body, username:', username);
 
     // 1) ensure users table
@@ -56,7 +81,7 @@ export default async function handler(event, context) {
     });
     return new Response(JSON.stringify({ 
       error: 'Internal server error',
-      details: error.message // Adding error details to help debug
+      details: error.message
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
