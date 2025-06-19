@@ -30,7 +30,11 @@ export default async function handler(event) {
         details: e.message
       }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type'
+        }
       });
     }
 
@@ -41,7 +45,11 @@ export default async function handler(event) {
         details: 'Both username and password are required'
       }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type'
+        }
       });
     }
 
@@ -72,7 +80,11 @@ export default async function handler(event) {
       console.log('Username already exists');
       return new Response(JSON.stringify({ error: 'Username taken' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type'
+        }
       });
     }
 
@@ -93,7 +105,13 @@ export default async function handler(event) {
 
     const response = {
       message: 'OK',
-      user: user
+      user: {
+        username: user.username,
+        elo: user.elo,
+        coins: user.coins,
+        wins: user.wins,
+        losses: user.losses
+      }
     };
     console.log('Sending response:', response);
     return new Response(JSON.stringify(response), {

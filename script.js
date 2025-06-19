@@ -69,23 +69,17 @@ class PingPongHub {
         });
         
         console.log('Signup response status:', res.status);
-        let data;
-        try {
-          data = await res.json();
-          console.log('Signup response data:', data);
-        } catch (e) {
-          console.error('Error parsing signup response:', e);
-          return this.showMessage('Invalid server response', 'error');
-        } finally {
-          signupBtn.disabled = false;
-        }
+        let data = await res.json();
+        console.log('Signup response data:', data);
         
         if (!res.ok) {
+          signupBtn.disabled = false;
           console.error('Signup error:', data);
           return this.showMessage(data.error || 'Signup failed', 'error');
         }
         
         if (!data.user) {
+          signupBtn.disabled = false;
           console.error('No user data in signup response:', data);
           return this.showMessage('Invalid server response', 'error');
         }
@@ -126,23 +120,17 @@ class PingPongHub {
         });
         
         console.log('Login response status:', res.status);
-        let data;
-        try {
-          data = await res.json();
-          console.log('Login response data:', data);
-        } catch (e) {
-          console.error('Error parsing login response:', e);
-          return this.showMessage('Invalid server response', 'error');
-        } finally {
-          loginBtn.disabled = false;
-        }
+        let data = await res.json();
+        console.log('Login response data:', data);
         
         if (!res.ok) {
+          loginBtn.disabled = false;
           console.error('Login error:', data);
           return this.showMessage(data.error || 'Login failed', 'error');
         }
         
         if (!data.user) {
+          loginBtn.disabled = false;
           console.error('No user data in login response:', data);
           return this.showMessage('Invalid server response', 'error');
         }
