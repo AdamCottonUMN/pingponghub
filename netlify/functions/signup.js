@@ -22,10 +22,10 @@ export default async function handler(event, context) {
       SELECT 1 FROM users WHERE username = ${username}
     `
     if (exists) {
-      return { 
-        statusCode: 400, 
-        body: JSON.stringify({ error: 'Username taken' })
-      }
+      return new Response(JSON.stringify({ error: 'Username taken' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      })
     }
 
     // 3) insert new user
@@ -33,15 +33,15 @@ export default async function handler(event, context) {
       INSERT INTO users (username, password, elo, coins, wins, losses)
       VALUES (${username}, ${password}, 1000, 500, 0, 0);
     `
-    return { 
-      statusCode: 200, 
-      body: JSON.stringify({ message: 'OK' })
-    }
+    return new Response(JSON.stringify({ message: 'OK' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    })
   } catch (error) {
     console.error('Signup error:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' })
-    }
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    })
   }
 }
