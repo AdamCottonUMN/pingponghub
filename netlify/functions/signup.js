@@ -6,8 +6,22 @@ export default async function handler(event) {
     // Parse request body
     let body;
     try {
-      body = event.body ? JSON.parse(event.body) : event;
-      console.log('Request body:', body);
+      // Check if body is a ReadableStream
+      if (event.body && typeof event.body.getReader === 'function') {
+        const reader = event.body.getReader();
+        const chunks = [];
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+        }
+        const bodyText = new TextDecoder().decode(Buffer.concat(chunks));
+        body = JSON.parse(bodyText);
+      } else {
+        // Fallback to direct parsing if not a stream
+        body = event.body ? JSON.parse(event.body) : event;
+      }
+      console.log('Parsed request body:', body);
     } catch (e) {
       console.error('Error parsing body:', e);
       return new Response(JSON.stringify({ 
