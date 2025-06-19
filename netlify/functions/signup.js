@@ -83,7 +83,16 @@ export default async function handler(event) {
     `;
     console.log('User created successfully');
 
-    return new Response(JSON.stringify({ message: 'OK' }), {
+    // Fetch the created user
+    const [user] = await sql`
+      SELECT username, elo, coins, wins, losses
+      FROM users WHERE username = ${username}
+    `;
+
+    return new Response(JSON.stringify({ 
+      message: 'OK',
+      user: user
+    }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });

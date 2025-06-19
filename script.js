@@ -51,21 +51,28 @@ class PingPongHub {
       if (!u || !p) {
         return this.showMessage('Fill in both fields','error');
       }
-      let res = await fetch('/.netlify/functions/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({username:u,password:p}),
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        return this.showMessage(errorData.error || 'Signup failed', 'error');
+      try {
+        let res = await fetch('/.netlify/functions/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({username:u,password:p}),
+        });
+        
+        const data = await res.json();
+        if (!res.ok) {
+          return this.showMessage(data.error || 'Signup failed', 'error');
+        }
+        
+        this.currentUser = data.user || { username:u };
+        localStorage.setItem('pingpong_currentUser', JSON.stringify(this.currentUser));
+        await this.reloadAllData();
+        this.showMainScreen();
+      } catch (error) {
+        console.error('Signup error:', error);
+        this.showMessage('Signup failed', 'error');
       }
-      this.currentUser = { username:u };
-      localStorage.setItem('pingpong_currentUser', JSON.stringify(this.currentUser));
-      await this.reloadAllData();
-      this.showMainScreen();
     }
   
     async login() {
@@ -82,12 +89,25 @@ class PingPongHub {
           },
           body: JSON.stringify({username: u, password: p}),
         });
-        if (!res.ok) {
-          const errorData = await res.json();
-          return this.showMessage(errorData.error || 'Login failed', 'error');
+        
+        let data;
+        try {
+          data = await res.json();
+        } catch (e) {
+          console.error('Error parsing response:', e);
+          return this.showMessage('Invalid server response', 'error');
         }
-        const data = await res.json();
-        this.currentUser = data.user || { username: u };
+        
+        if (!res.ok) {
+          return this.showMessage(data.error || 'Login failed', 'error');
+        }
+        
+        if (!data.user) {
+          console.error('No user data in response:', data);
+          return this.showMessage('Invalid server response', 'error');
+        }
+        
+        this.currentUser = data.user;
         localStorage.setItem('pingpong_currentUser', JSON.stringify(this.currentUser));
         await this.reloadAllData();
         this.showMainScreen();
