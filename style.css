@@ -410,6 +410,10 @@ button:disabled {
 /* Leaderboard Styles */
 .leaderboard-section {
   margin-bottom: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .leaderboard-section h3 {
@@ -429,7 +433,7 @@ button:disabled {
   display: grid;
   grid-template-columns: 50px 1fr 100px;
   align-items: center;
-  padding: 0.5rem;
+  padding: 0.75rem;
   background: #f8f9fa;
   border-radius: 4px;
   transition: background-color 0.2s;
