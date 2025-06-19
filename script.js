@@ -179,25 +179,46 @@ class PingPongHub {
         // users
         console.log('Fetching users...');
         let ures = await fetch('/.netlify/functions/users');
-        this.users = (await ures.json()).users;
+        if (!ures.ok) {
+          throw new Error(`Users API error: ${ures.status}`);
+        }
+        let userData = await ures.json();
+        if (!userData.users) {
+          throw new Error('Invalid users response format');
+        }
+        this.users = userData.users;
         console.log('Users loaded:', this.users);
     
         // matches
         console.log('Fetching matches...');
         let mres = await fetch('/.netlify/functions/matches');
-        this.matches = (await mres.json()).matches;
+        if (!mres.ok) {
+          throw new Error(`Matches API error: ${mres.status}`);
+        }
+        let matchData = await mres.json();
+        if (!matchData.matches) {
+          throw new Error('Invalid matches response format');
+        }
+        this.matches = matchData.matches;
         console.log('Matches loaded:', this.matches);
     
         // tournaments
         console.log('Fetching tournaments...');
         let tres = await fetch('/.netlify/functions/tournaments');
-        this.tournaments = (await tres.json()).tournaments;
+        if (!tres.ok) {
+          throw new Error(`Tournaments API error: ${tres.status}`);
+        }
+        let tournamentData = await tres.json();
+        if (!tournamentData.tournaments) {
+          throw new Error('Invalid tournaments response format');
+        }
+        this.tournaments = tournamentData.tournaments;
         console.log('Tournaments loaded:', this.tournaments);
         
         console.log('All data reloaded successfully');
       } catch (error) {
         console.error('Error reloading data:', error);
-        this.showMessage('Error loading data', 'error');
+        this.showMessage('Error loading data: ' + error.message, 'error');
         throw error; // Re-throw to be caught by the calling function
       }
     }
