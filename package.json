@@ -5,7 +5,7 @@
       "node": "18.x"
     },
     "dependencies": {
-      "@netlify/neon": "^1.0.0"
+      "@netlify/neon": "^0.1.0"
     }
   }
   
