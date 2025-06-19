@@ -269,3 +269,14 @@ class PingPongHub {
   function createTournament() { app.createTournament(); }
   function showLeaderboard()   { app.loadLeaderboards(); }
   
+  // Add tab switching functionality
+  function switchTab(tab) {
+    // Update tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`${tab}-tab`).classList.add('active');
+    
+    // Update form visibility
+    document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+    document.getElementById(`${tab}-form`).classList.add('active');
+  }
+  
