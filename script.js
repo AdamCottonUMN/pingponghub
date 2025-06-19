@@ -48,10 +48,17 @@ class PingPongHub {
     async signup() {
       const u = document.getElementById('signup-username').value.trim();
       const p = document.getElementById('signup-password').value;
+      const signupBtn = document.getElementById('signup-button');
+      
       if (!u || !p) {
         return this.showMessage('Fill in both fields','error');
       }
+      
       try {
+        // Show loading state
+        signupBtn.disabled = true;
+        this.showMessage('Creating account...', 'info');
+        
         console.log('Attempting signup for user:', u);
         let res = await fetch('/.netlify/functions/signup', {
           method: 'POST',
@@ -69,6 +76,8 @@ class PingPongHub {
         } catch (e) {
           console.error('Error parsing signup response:', e);
           return this.showMessage('Invalid server response', 'error');
+        } finally {
+          signupBtn.disabled = false;
         }
         
         if (!res.ok) {
@@ -83,21 +92,30 @@ class PingPongHub {
         
         this.currentUser = data.user;
         localStorage.setItem('pingpong_currentUser', JSON.stringify(this.currentUser));
+        this.showMessage('Account created! Loading your dashboard...', 'success');
         await this.reloadAllData();
         this.showMainScreen();
       } catch (error) {
         console.error('Signup error:', error);
         this.showMessage('Signup failed', 'error');
+        signupBtn.disabled = false;
       }
     }
   
     async login() {
       const u = document.getElementById('login-username').value.trim();
       const p = document.getElementById('login-password').value;
+      const loginBtn = document.getElementById('login-button');
+      
       if (!u || !p) {
         return this.showMessage('Fill in both fields','error');
       }
+      
       try {
+        // Show loading state
+        loginBtn.disabled = true;
+        this.showMessage('Logging in...', 'info');
+        
         console.log('Attempting login for user:', u);
         let res = await fetch('/.netlify/functions/login', {
           method: 'POST',
@@ -115,6 +133,8 @@ class PingPongHub {
         } catch (e) {
           console.error('Error parsing login response:', e);
           return this.showMessage('Invalid server response', 'error');
+        } finally {
+          loginBtn.disabled = false;
         }
         
         if (!res.ok) {
@@ -129,11 +149,13 @@ class PingPongHub {
         
         this.currentUser = data.user;
         localStorage.setItem('pingpong_currentUser', JSON.stringify(this.currentUser));
+        this.showMessage('Login successful! Loading your dashboard...', 'success');
         await this.reloadAllData();
         this.showMainScreen();
       } catch (error) {
         console.error('Login error:', error);
         this.showMessage('Login failed', 'error');
+        loginBtn.disabled = false;
       }
     }
   
@@ -147,7 +169,16 @@ class PingPongHub {
       const msg = document.getElementById('auth-message');
       msg.textContent = text;
       msg.className = `message ${type}`;
-      setTimeout(() => { msg.textContent=''; msg.className='message' }, 3000);
+      // Only auto-clear non-info messages
+      if (type !== 'info') {
+        setTimeout(() => { 
+          // Only clear if it's still showing our message
+          if (msg.textContent === text) {
+            msg.textContent = '';
+            msg.className = 'message';
+          }
+        }, 3000);
+      }
     }
   
     // ----------------------------------
