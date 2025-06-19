@@ -52,11 +52,15 @@ class PingPongHub {
         return this.showMessage('Fill in both fields','error');
       }
       let res = await fetch('/.netlify/functions/signup', {
-        method:'POST',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({username:u,password:p}),
       });
       if (!res.ok) {
-        return this.showMessage(await res.text(),'error');
+        const errorData = await res.json();
+        return this.showMessage(errorData.error || 'Signup failed', 'error');
       }
       this.currentUser = { username:u };
       localStorage.setItem('pingpong_currentUser', JSON.stringify(this.currentUser));
