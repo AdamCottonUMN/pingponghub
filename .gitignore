@@ -1,0 +1,7 @@
+# ignore system files
+.DS_Store
+Thumbs.db
+
+# ignore IDE/editor folders
+.vscode/
+.idea/

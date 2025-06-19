@@ -1,0 +1,142 @@
+PingPongHub – Workplace Ping Pong Platform
+Purpose
+PingPongHub is a workplace-focused app that promotes casual competition and community through ping pong. Players can schedule matches, run tournaments, place friendly bets with virtual coins, and climb both a skill-based Elo leaderboard and a playful Coin leaderboard.
+
+Core Features
+1. Simple Account System
+Signup/Login with just a username and password
+
+No email required
+
+Optional profile picture
+
+Each profile shows:
+
+Username
+
+Elo rating
+
+Coin balance
+
+Win/loss record
+
+Match history
+
+2. Matchmaking & Scheduling
+Challenge a coworker to a match
+
+Set date and time
+
+Optional coin wager (both must agree)
+
+View upcoming matches in a personal schedule
+
+Push notification or in-app reminders (email not needed)
+
+3. Match Result Reporting
+Winner reports match result
+
+Loser confirms within 24 hours
+
+If disputed, admin can intervene
+
+Elo and coin transfers triggered upon confirmation
+
+4. Tournaments
+Users can create or join tournaments:
+
+Single elimination or round-robin
+
+Public or invite-only
+
+Automatic bracket generation
+
+Elo adjustments after each match
+
+Coins may be awarded to winners
+
+5. Elo Ranking System
+Standard Elo algorithm (e.g., K = 32)
+
+Elo gains/losses based on relative skill
+
+All confirmed matches impact Elo
+
+Visible Elo leaderboard sorted from highest to lowest rating
+
+6. Fake Coin Betting System
+Each user starts with a fixed amount of coins (e.g., 500)
+
+Coins can be bet in 1v1 matches
+
+Win/loss updates coin totals
+
+No real-world value
+
+Admin panel to reset or grant coins if needed
+
+Visible Coin leaderboard sorted by richest users
+
+7. Leaderboards
+Elo Leaderboard: Ranked by skill
+
+Coin Leaderboard: Ranked by coin total
+
+Filter by:
+
+All-time
+
+Monthly
+
+Win streaks (optional)
+
+8. Admin Tools
+View/edit all user stats
+
+Resolve match result disputes
+
+Reset coins or manually adjust Elo
+
+Create official workplace tournaments
+
+Stretch Features (Phase 2)
+Avatars and profile customization
+
+"Spectator mode" where users can place fun bets on matches
+
+QR code scanning to quickly report match results
+
+MS Teams/Slack bot integration
+
+Tech Stack Recommendation
+Frontend
+React.js + Tailwind CSS (web)
+
+Optionally build a mobile app later using React Native
+
+Backend
+Node.js + Express or Next.js
+
+PostgreSQL (via Supabase or hosted DB)
+
+Auth: Custom username/password logic (bcrypt + JWT)
+
+Elo and coin logic handled in the backend
+
+Deployment
+Frontend: Vercel or Netlify
+
+Backend/API + DB: Supabase / Render / Railway
+
+User Flow Example
+User signs up with just a username and password
+
+They see the Elo and Coin leaderboards
+
+They challenge a coworker to a match for 50 coins
+
+Both confirm the result after the match
+
+Elo updates, coins transfer
+
+Leaderboards update in real-time
