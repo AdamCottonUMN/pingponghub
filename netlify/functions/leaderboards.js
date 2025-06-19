@@ -3,16 +3,14 @@ import { neon } from '@netlify/neon'
 export default async function handler() {
   try {
     console.log('Fetching leaderboards data...');
-    const sql = neon()
+    const sql = neon();
 
-    // Get all users sorted by elo and coins
+    // Get all users
     const users = await sql`
-      SELECT username, elo, coins
-      FROM users
-      ORDER BY elo DESC, coins DESC;
+      SELECT username, elo, coins FROM users;
     `;
 
-    // Split into two sorted lists
+    // Sort for leaderboards
     const elo = [...users].sort((a, b) => b.elo - a.elo);
     const coins = [...users].sort((a, b) => b.coins - a.coins);
 

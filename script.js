@@ -248,11 +248,13 @@ class PingPongHub {
       const name = btn.textContent.toLowerCase();
       document.querySelectorAll('.tab-content').forEach(tc=>tc.classList.remove('active'));
       document.getElementById(name).classList.add('active');
-      if (name==='dashboard') this.loadDashboard();
-      if (name==='matches')    this.loadMatches();
-      if (name==='tournaments')this.loadTournaments();
-      if (name==='leaderboards')this.loadLeaderboards();
-      if (name==='profile')    this.loadProfile();
+      
+      // Load tab content
+      if (name === 'dashboard') this.loadDashboard();
+      if (name === 'matches') this.loadMatches();
+      if (name === 'tournaments') this.loadTournaments();
+      if (name === 'leaderboards') this.loadLeaderboards();
+      if (name === 'profile') this.loadProfile();
     }
   
     // ----------------------------------
@@ -373,12 +375,15 @@ class PingPongHub {
         const ctr = document.getElementById('leaderboard-content');
         ctr.innerHTML = '<div class="loading">Loading leaderboards...</div>';
         
+        console.log('Loading leaderboards...');
         let res = await fetch('/.netlify/functions/leaderboards');
         if (!res.ok) {
           throw new Error(`Leaderboards API error: ${res.status}`);
         }
         
         let data = await res.json();
+        console.log('Leaderboards data:', data);
+        
         if (!data.elo || !data.coins) {
           throw new Error('Invalid leaderboard data format');
         }
